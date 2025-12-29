@@ -601,7 +601,7 @@ app.factory('dataFactory', function($http){
 
 ```
 
-### resources/views/templates/home.html
+### public/templates/home.html
 
 ```
 
@@ -609,7 +609,7 @@ app.factory('dataFactory', function($http){
 
 ```
 
-### resources/views/templates/items.html
+### public/templates/items.html
 
 ```
 
@@ -738,7 +738,7 @@ app.factory('dataFactory', function($http){
 
 ```
 
-### resources/views/templates/dirPagination.html
+### public/templates/dirPagination.html
 
 ```
 
