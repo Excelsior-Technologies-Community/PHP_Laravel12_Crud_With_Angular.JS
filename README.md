@@ -820,38 +820,48 @@ PHP_Laravel12_Crud_With_Angular.JS
 │   ├── Http
 │   │   └── Controllers
 │   │       └── ItemController.php
+│   │
 │   └── Models
 │       └── Item.php
 │
 ├── database
 │   └── migrations
-│       └── xxxx_create_items_table.php
-│
-├── public
-│   └── app
-│       ├── controllers
-│       │   └── ItemController.js
-│       ├── helper
-│       │   └── myHelper.js
-│       ├── packages
-│       │   └── dirPagination.js
-│       ├── routes.js
-│       └── services
-│           └── myServices.js
-│
-├── resources
-│   └── views
-│       ├── app.blade.php
-│       └── templates
-│           ├── home.html
-│           ├── items.html
-│           └── dirPagination.html
+│       └── xxxx_xx_xx_create_items_table.php
 │
 ├── routes
 │   └── web.php
 │
+├── public
+│   ├── app
+│   │   ├── controllers
+│   │   │   └── ItemController.js
+│   │   │
+│   │   ├── services
+│   │   │   └── myServices.js
+│   │   │
+│   │   ├── helper
+│   │   │   └── myHelper.js
+│   │   │
+│   │   ├── packages
+│   │   │   └── dirPagination.js
+│   │   │
+│   │   └── routes.js
+│   │
+│   └── templates
+│       ├── home.html
+│       ├── items.html
+│       └── dirPagination.html
+│
+├── resources
+│   └── views
+│       └── app.blade.php
+│
 ├── .env
 ├── composer.json
 └── README.md
+
+
+
+```
 
 ```
