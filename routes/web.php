@@ -15,3 +15,5 @@ Route::get('/templates/{template}', function($template){
     $template = str_replace(".html","",$template);
     return view('templates.'.$template);
 });
+
+Route::put('items/{id}/toggle-status', [ItemController::class, 'toggleStatus']);

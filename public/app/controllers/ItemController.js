@@ -1,4 +1,4 @@
-app.controller('ItemController', ['dataFactory', '$scope', function(dataFactory, $scope) {
+app.controller('ItemController', ['dataFactory', '$scope', function (dataFactory, $scope) {
 
     $scope.items = [];
     $scope.totalItems = 0;
@@ -11,7 +11,7 @@ app.controller('ItemController', ['dataFactory', '$scope', function(dataFactory,
     // ==========================
     function getResultsPage(page) {
         let url = 'items?page=' + page;
-        dataFactory.httpRequest(url).then(function(response) {
+        dataFactory.httpRequest(url).then(function (response) {
             $scope.items = response.data;
             $scope.totalItems = response.total;
             $scope.currentPage = page;
@@ -24,9 +24,9 @@ app.controller('ItemController', ['dataFactory', '$scope', function(dataFactory,
     // ==========================
     // CREATE ITEM
     // ==========================
-    $scope.saveAdd = function() {
+    $scope.saveAdd = function () {
         dataFactory.httpRequest('items', 'POST', {}, $scope.createForm)
-            .then(function(response) {
+            .then(function (response) {
                 $scope.items.unshift(response);
                 $scope.totalItems += 1;
                 $scope.createForm = {}; // reset form
@@ -41,10 +41,10 @@ app.controller('ItemController', ['dataFactory', '$scope', function(dataFactory,
     // ==========================
     // EDIT ITEM
     // ==========================
-    $scope.edit = function(id) {
+    $scope.edit = function (id) {
         dataFactory.httpRequest('items/' + id + '/edit')
-            .then(function(response) {
-              
+            .then(function (response) {
+
                 $scope.editForm = angular.copy(response);
             });
     };
@@ -52,9 +52,9 @@ app.controller('ItemController', ['dataFactory', '$scope', function(dataFactory,
     // ==========================
     // UPDATE ITEM
     // ==========================
-    $scope.saveEdit = function() {
+    $scope.saveEdit = function () {
         dataFactory.httpRequest('items/' + $scope.editForm.id, 'PUT', {}, $scope.editForm)
-            .then(function(response) {
+            .then(function (response) {
                 for (let i = 0; i < $scope.items.length; i++) {
                     if ($scope.items[i].id === response.id) {
                         $scope.items[i] = response;
@@ -69,14 +69,35 @@ app.controller('ItemController', ['dataFactory', '$scope', function(dataFactory,
     // ==========================
     // DELETE ITEM
     // ==========================
-    $scope.remove = function(item, index) {
+    $scope.remove = function (item, index) {
         if (confirm("Are you sure you want to delete this item?")) {
             dataFactory.httpRequest('items/' + item.id, 'DELETE')
-                .then(function() {
+                .then(function () {
                     $scope.items.splice(index, 1);
                     $scope.totalItems -= 1;
                 });
         }
+    };
+
+    // ==========================
+    // Search
+    // ==========================
+    $scope.searchDB = function () {
+        let url = 'items?search=' + ($scope.searchText || '');
+        dataFactory.httpRequest(url).then(function (response) {
+            $scope.items = response.data;
+            $scope.totalItems = response.total;
+        });
+    };
+
+    // ==========================
+    // Toggle Status
+    // ==========================
+    $scope.toggleStatus = function (item, index) {
+        dataFactory.httpRequest('items/' + item.id + '/toggle-status', 'PUT')
+            .then(function (response) {
+                $scope.items[index] = response;
+            });
     };
 
 }]);
