@@ -4,13 +4,14 @@
             <h1>Item Management</h1>
         </div>
         <div class="pull-right" style="padding-top:30px">
-            <div class="box-tools" style="display:inline-table">
-                <!-- <div class="input-group">
+            <div class="box-tools" style="display:inline-table; margin-right:10px;">
+                <!-- SEARCH INPUT -->
+                <div class="input-group">
                     <input type="text" class="form-control input-sm" placeholder="Search" ng-change="searchDB()" ng-model="searchText">
                     <span class="input-group-addon">Search</span>
-                </div> -->
+                </div>
             </div>
-            <button class="btn btn-success" data-toggle="modal" data-target="#create-user">Create New</button>
+            <button class="btn btn-success" data-toggle="modal" data-target="#create-user" style="margin-top: -25px;">Create New</button>
         </div>
     </div>
 </div>
@@ -21,42 +22,30 @@
             <th>No</th>
             <th>Title</th>
             <th>Description</th>
-            <th width="220px">Action</th>
+            <th>Status</th>
+            <th width="260px">Action</th>
         </tr>
     </thead>
     <tbody>
-        <!-- <tr dir-paginate="value in items | itemsPerPage:5" total-items="totalItems">
-            <td>{{ value.id }}</td>
-            <td>{{ value.title }}</td>
-            <td>{{ value.description }}</td>
-            <td>
-                <button class="btn btn-primary" ng-click="edit(value.id)" data-toggle="modal" data-target="#edit-data">Edit</button>
-                <button class="btn btn-danger" ng-click="remove(value, $index)">Delete</button>
-            </td>
-        </tr> -->
-
         <tr ng-repeat="item in items">
-    <td>{{ item.id }}</td>
-    <td>{{ item.title }}</td>
-    <td>{{ item.description }}</td>
-<td>
-             <!-- <button class="btn btn-primary" ng-click="edit(item.id)" data-toggle="modal" data-target="#edit-data">Edit</button> -->
-<button class="btn btn-primary" ng-click="edit(item.id)" data-toggle="modal" data-target="#edit-data">Edit</button>
-
-               <button class="btn btn-danger" ng-click="remove(item, $index)">Delete</button>
-
+            <td>{{ item.id }}</td>
+            <td>{{ item.title }}</td>
+            <td>{{ item.description }}</td>
+            <td>
+                <span class="label" ng-class="{'label-success': item.status=='active','label-danger': item.status=='inactive'}">
+                    {{ item.status }}
+                </span>
             </td>
-
-</tr>
-
+            <td>
+                <button class="btn btn-primary" ng-click="edit(item.id)" data-toggle="modal" data-target="#edit-data">Edit</button>
+                <button class="btn btn-danger" ng-click="remove(item, $index)">Delete</button>
+                <button class="btn btn-warning btn-sm" ng-click="toggleStatus(item, $index)">Toggle Status</button>
+            </td>
+        </tr>
     </tbody>
 </table>
 
-<dir-pagination-controls
-    class="pull-right"
-    on-page-change="pageChanged(newPageNumber)"
-    template-url="templates/dirPagination.html">
-</dir-pagination-controls>
+<dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="templates/dirPagination.html"></dir-pagination-controls>
 
 <!-- Create Modal -->
 <div class="modal fade" id="create-user" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -87,31 +76,25 @@
 </div>
 
 <!-- Edit Modal -->
-<!-- Edit Modal -->
 <div class="modal fade" id="edit-data" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form name="editItem" ng-submit="saveEdit()">
-                <!-- Hidden field for ID -->
                 <input ng-model="editForm.id" type="hidden">
-
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Edit Item</h4>
                 </div>
-
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="title"><strong>Title:</strong></label>
                         <input id="title" ng-model="editForm.title" type="text" class="form-control" required>
                     </div>
-
                     <div class="form-group">
                         <label for="description"><strong>Description:</strong></label>
                         <textarea id="description" ng-model="editForm.description" class="form-control" required></textarea>
                     </div>
                 </div>
-
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                     <button type="submit" ng-disabled="editItem.$invalid" class="btn btn-primary">Update</button>
@@ -120,4 +103,3 @@
         </div>
     </div>
 </div>
-

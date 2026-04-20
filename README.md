@@ -864,4 +864,7 @@ PHP_Laravel12_Crud_With_Angular.JS
 
 ```
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> development

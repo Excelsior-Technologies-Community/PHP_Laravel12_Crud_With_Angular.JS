@@ -17,12 +17,15 @@ public function index(Request $request)
               ->orWhere('description', 'like', '%' . $request->search . '%');
     }
 
+    if ($request->has('status')) {
+        $query->where('status', $request->status);
+    }
+
     $items = $query->orderBy('id', 'asc')->paginate(5);
 
-    // Return in the format AngularJS expects
     return response()->json([
-        'data' => $items->items(),  // actual items array
-        'total' => $items->total(), // total items for pagination
+        'data' => $items->items(),
+        'total' => $items->total(),
     ]);
 }
 
@@ -64,4 +67,13 @@ public function store(Request $request)
         Item::where('id',$id)->delete();
         return response()->json(['success'=>'Item deleted']);
     }
+
+    public function toggleStatus($id)
+{
+    $item = Item::findOrFail($id);
+    $item->status = $item->status === 'active' ? 'inactive' : 'active';
+    $item->save();
+
+    return response()->json($item);
+}
 }
