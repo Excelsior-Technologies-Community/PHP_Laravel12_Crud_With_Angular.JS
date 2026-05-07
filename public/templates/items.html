@@ -1,82 +1,199 @@
+
 <div class="row">
     <div class="col-lg-12 margin-tb">
+
         <div class="pull-left">
-            <h1>Item Management</h1>
+            <h1>
+                Item Management
+             
+                <span class="badge" style="background:#5cb85c; font-size:14px;">
+                    {{ totalItems }} items
+                </span>
+            </h1>
         </div>
-        <div class="pull-right" style="padding-top:30px">
+
+        <div class="pull-right" style="padding-top:30px;">
+
+        
+            <a href="/items/export-csv" class="btn btn-info" style="margin-right:6px;">
+                <span class="glyphicon glyphicon-download-alt"></span> Export CSV
+            </a>
+
+          
+            <button class="btn btn-danger"
+                    ng-show="selectedIds.length > 0"
+                    ng-click="bulkDelete()"
+                    style="margin-right:6px;">
+                <span class="glyphicon glyphicon-trash"></span>
+                Delete Selected ({{ selectedIds.length }})
+            </button>
+
             <div class="box-tools" style="display:inline-table; margin-right:10px;">
-                <!-- SEARCH INPUT -->
-                <div class="input-group">
-                    <input type="text" class="form-control input-sm" placeholder="Search" ng-change="searchDB()" ng-model="searchText">
-                    <span class="input-group-addon">Search</span>
+              
+                <div class="input-group search-wrapper">
+                    <input type="text"
+                           class="form-control input-sm"
+                           placeholder="Search..."
+                           ng-model="searchText"
+                           ng-change="onSearchChange()"
+                           ng-keydown="onSearchKeydown($event)"
+                           autocomplete="off">
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </span>
+
+                    <!-- Suggestions dropdown -->
+                    <ul class="suggestions-dropdown"
+                        ng-show="suggestions.length > 0">
+                        <li ng-repeat="s in suggestions"
+                            ng-click="selectSuggestion(s)">
+                            {{ s }}
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <button class="btn btn-success" data-toggle="modal" data-target="#create-user" style="margin-top: -25px;">Create New</button>
+
+            <button class="btn btn-success"
+                    data-toggle="modal"
+                    data-target="#create-user"
+                    style="margin-top:-25px;">
+                Create New
+            </button>
         </div>
     </div>
 </div>
 
-<table class="table table-bordered">
+<!-- Items Table -->
+<table class="table table-bordered table-hover">
     <thead>
         <tr>
-            <th>No</th>
-            <th>Title</th>
+            <!-- NEW: Select All checkbox -->
+            <th width="30px">
+                <input type="checkbox"
+                       ng-model="selectAll"
+                       ng-change="toggleSelectAll()">
+            </th>
+
+            <!-- NEW: Sortable column headers -->
+            <th ng-click="sortBy('id')" style="cursor:pointer;">
+                No
+                <span ng-show="sort.column=='id'">
+                    <span ng-show="sort.dir=='asc'">▲</span>
+                    <span ng-show="sort.dir=='desc'">▼</span>
+                </span>
+            </th>
+            <th ng-click="sortBy('title')" style="cursor:pointer;">
+                Title
+                <span ng-show="sort.column=='title'">
+                    <span ng-show="sort.dir=='asc'">▲</span>
+                    <span ng-show="sort.dir=='desc'">▼</span>
+                </span>
+            </th>
             <th>Description</th>
-            <th>Status</th>
+            <th ng-click="sortBy('status')" style="cursor:pointer;">
+                Status
+                <span ng-show="sort.column=='status'">
+                    <span ng-show="sort.dir=='asc'">▲</span>
+                    <span ng-show="sort.dir=='desc'">▼</span>
+                </span>
+            </th>
             <th width="260px">Action</th>
         </tr>
     </thead>
     <tbody>
-        <tr ng-repeat="item in items">
+        <tr ng-repeat="item in items"
+            ng-class="{'warning': isSelected(item.id)}">
+
+            <!-- NEW: Row checkbox for bulk select -->
+            <td>
+                <input type="checkbox"
+                       ng-model="item._selected"
+                       ng-change="updateSelectedIds(item)">
+            </td>
+
             <td>{{ item.id }}</td>
             <td>{{ item.title }}</td>
             <td>{{ item.description }}</td>
             <td>
-                <span class="label" ng-class="{'label-success': item.status=='active','label-danger': item.status=='inactive'}">
+                <span class="label"
+                      ng-class="{
+                          'label-success': item.status=='active',
+                          'label-danger':  item.status=='inactive'
+                      }">
                     {{ item.status }}
                 </span>
             </td>
             <td>
-                <button class="btn btn-primary" ng-click="edit(item.id)" data-toggle="modal" data-target="#edit-data">Edit</button>
-                <button class="btn btn-danger" ng-click="remove(item, $index)">Delete</button>
-                <button class="btn btn-warning btn-sm" ng-click="toggleStatus(item, $index)">Toggle Status</button>
+                <button class="btn btn-primary btn-sm"
+                        ng-click="edit(item.id)"
+                        data-toggle="modal"
+                        data-target="#edit-data">Edit</button>
+
+                <button class="btn btn-danger btn-sm"
+                        ng-click="remove(item, $index)">Delete</button>
+
+                <button class="btn btn-warning btn-sm"
+                        ng-click="toggleStatus(item, $index)">Toggle Status</button>
+            </td>
+        </tr>
+
+        <!-- No items found message -->
+        <tr ng-if="items.length == 0">
+            <td colspan="6" class="text-center text-muted">
+                No items found.
             </td>
         </tr>
     </tbody>
 </table>
 
-<dir-pagination-controls class="pull-right" on-page-change="pageChanged(newPageNumber)" template-url="templates/dirPagination.html"></dir-pagination-controls>
+<!-- Pagination -->
+<dir-pagination-controls
+    class="pull-right"
+    on-page-change="pageChanged(newPageNumber)"
+    template-url="templates/dirPagination.html">
+</dir-pagination-controls>
 
-<!-- Create Modal -->
-<div class="modal fade" id="create-user" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+<!-- ===================== CREATE MODAL ===================== -->
+<div class="modal fade" id="create-user" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form name="addItem" ng-submit="saveAdd()">
                 <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
                     <h4 class="modal-title">Create Item</h4>
                 </div>
                 <div class="modal-body">
                     <div class="form-group">
                         <strong>Title:</strong>
-                        <input ng-model="createForm.title" type="text" class="form-control" placeholder="Title" required>
+                        <input ng-model="createForm.title"
+                               type="text"
+                               class="form-control"
+                               placeholder="Title"
+                               required>
                     </div>
                     <div class="form-group">
                         <strong>Description:</strong>
-                        <textarea ng-model="createForm.description" class="form-control" placeholder="Description" required></textarea>
+                        <textarea ng-model="createForm.description"
+                                  class="form-control"
+                                  placeholder="Description"
+                                  required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" ng-disabled="addItem.$invalid" class="btn btn-primary">Submit</button>
+                    <button type="submit"
+                            ng-disabled="addItem.$invalid"
+                            class="btn btn-primary">Submit</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Edit Modal -->
-<div class="modal fade" id="edit-data" tabindex="-1" role="dialog" aria-labelledby="editModalLabel">
+<!-- ===================== EDIT MODAL ===================== -->
+<div class="modal fade" id="edit-data" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form name="editItem" ng-submit="saveEdit()">
@@ -88,16 +205,25 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label for="title"><strong>Title:</strong></label>
-                        <input id="title" ng-model="editForm.title" type="text" class="form-control" required>
+                        <input id="title"
+                               ng-model="editForm.title"
+                               type="text"
+                               class="form-control"
+                               required>
                     </div>
                     <div class="form-group">
                         <label for="description"><strong>Description:</strong></label>
-                        <textarea id="description" ng-model="editForm.description" class="form-control" required></textarea>
+                        <textarea id="description"
+                                  ng-model="editForm.description"
+                                  class="form-control"
+                                  required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" ng-disabled="editItem.$invalid" class="btn btn-primary">Update</button>
+                    <button type="submit"
+                            ng-disabled="editItem.$invalid"
+                            class="btn btn-primary">Update</button>
                 </div>
             </form>
         </div>
